@@ -1,22 +1,21 @@
 <template>
-  <div id="app">
-    <dwvVue />
-  </div>
+  <v-app>
+    <router-view name="appbar"/>
+    <router-view name="navbar"/>
+    <router-view name="footer"/>
+    <v-main>
+      <Snackbar></Snackbar>
+      <router-view name="content" :key="$route.fullPath"/>
+    </v-main>
+  </v-app>
 </template>
-
 <script>
-  import dwvVue from './components/dwv'
+  import Snackbar from "./components/Snackbar";
+
   export default {
-    name: 'app',
-    components: {
-      dwvVue
-    }
+    components: {Snackbar },
+    data: () => ({
+      name: "App",
+    })
   }
 </script>
-
-<style>
-  #app {
-    text-align: center;
-    height: 100vh;
-  }
-</style>

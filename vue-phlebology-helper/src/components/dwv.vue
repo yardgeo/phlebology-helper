@@ -96,7 +96,7 @@
                     ZoomAndPan: {},
                     WindowLevel: {},
                     Draw: {
-                        options: ['Ruler'],
+                        options: ['Roi'],
                         type: 'factory',
                         events: ['draw-create', 'draw-change', 'draw-move', 'draw-delete']
                     }
