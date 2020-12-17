@@ -10,7 +10,7 @@ const routes =
                 content: () => import('../views/Home'),
             },
             meta: {
-                title: 'Uralchem - Дашборд'
+                title: 'Phlebology helper'
             }
         },
         {

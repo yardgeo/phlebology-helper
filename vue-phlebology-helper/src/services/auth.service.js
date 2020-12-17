@@ -32,7 +32,7 @@ class AuthService {
             || !storage.getExpiry()
             || !(Date.now() < storage.getExpiry()))
         {
-            if (this.token_refresh() !== true)
+            if (this.tokenRefresh() !== true)
             {
                 this.logout();
                 return null;
@@ -42,7 +42,7 @@ class AuthService {
     }
 
 
-    login_email({email, password})
+    loginEmail({email, password})
     {
         let data =
             {
@@ -58,13 +58,13 @@ class AuthService {
     }
 
 
-    token_refresh() {
+    tokenRefresh() {
         if (!storage.getRefreshToken()) {
             return false;
         }
         let data = {
             refreshToken: storage.getRefreshToken()
-        }
+        };
 
         return axios.post(API_URL + 'token/refresh', data)
             .then(response => {
@@ -80,6 +80,42 @@ class AuthService {
         storage.removeExpiry();
         router.push('/sign-in');
         store.dispatch('reset');
+    }
+
+    getCode(email) {
+        return  axios.post(
+            API_URL + 'password/recovery',
+            {},
+            {
+                params: {
+                    email: email,
+                }
+            }).then(() => {
+            return true;
+        }).catch(e=>{console.log(e); return false;});
+    }
+
+    checkCode(data) {
+        return axios.post(
+            API_URL + 'password/recovery/check',
+            {},
+            {
+                params: data
+            }).then(() => {
+            return true;
+        }).catch(e=>{console.log(e); return false;});
+    }
+
+    changePassword(data) {
+        return  axios.post(
+            API_URL + 'password/change',
+            {},
+            {
+                params: data
+            }).then(() => {
+            router.push('/sign-in');
+            return true;
+        }).catch(e=>{console.log(e); return false;});
     }
 }
 

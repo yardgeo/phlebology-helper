@@ -3,6 +3,9 @@
         <v-layout align-center justify-center>
 			<v-flex xs12 sm8 md4>
                 <v-card class="elevation-4">
+                    <v-card-title class="headline text-truncate">
+                        Phlebology Helper
+                    </v-card-title>
                     <v-card-text class="pb-0 mb-0">
                         <v-form
                             ref="form"
@@ -72,10 +75,9 @@ export default {
 	},
 	methods: {
 		async onSignIn() {
-			let res = await this.$auth.login_email(this.signInData);
+			let res = await this.$auth.loginEmail(this.signInData);
 			if (res !== true) {
-                console.log('kek');
-				await this.$store.dispatch('Snackbar/set', res);
+				await this.$store.dispatch('Snackbar/set', 'Неверный пароль');
 			}
 		}
 	},
