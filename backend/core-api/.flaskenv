@@ -1,0 +1,1 @@
+FLASK_APP=swagger_server.app:application
