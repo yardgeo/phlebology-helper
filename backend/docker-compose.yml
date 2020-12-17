@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+  core-api-phleb:
+    container_name: core-api-phleb
+    ports:
+      - "8992:80"
+    build: ./core-api
+    environment:
+      - UWSGI_INI=uwsgi.ini
+      - PRE_START_PATH=/usr/src/phlebology-helper-backend/prestart.sh
+      - DATABASE_URL=postgresql://phlb_site:phlb_site@20.56.16.251:5432/viewer
+    networks:
+      - phlebology_helper_network
+
+
+
+networks:
+  phlebology_helper_network:
+    driver: bridge
