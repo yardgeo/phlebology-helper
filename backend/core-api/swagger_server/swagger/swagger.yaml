@@ -1,0 +1,232 @@
+---
+swagger: "2.0"
+info:
+  description: "Phlebology helper Project"
+  version: "1.0.0"
+  title: "Phlebology helper Project"
+basePath: "/api"
+tags:
+- name: "auth"
+  description: "Authorization"
+- name: "user"
+  description: "UserInfo"
+- name: "patient"
+  description: "patientInfo"
+- name: "dicom"
+  description: "dicomInfo"
+schemes:
+- "https"
+- "http"
+paths:
+  /dicom/preview:
+    get:
+      tags:
+      - "dicom"
+      summary: "Get patients ids"
+      operationId: "preview"
+      parameters: []
+      responses:
+        "200":
+          description: "preview"
+          schema:
+            type: file
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.patient_controller"
+  /patient/list:
+    get:
+      tags:
+      - "patient"
+      summary: "Get patients ids"
+      operationId: "get_patients_ids"
+      parameters: []
+      responses:
+        "200":
+          description: "Patients id"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.patient_controller"
+
+  /patient/{id}:
+    get:
+      tags:
+      - "patient"
+      summary: "Get patient by id"
+      operationId: "get_patient"
+      parameters:
+      - in: "path"
+        type: string
+        name: "id"
+        description: "Patient id"
+        required: true
+      responses:
+        "200":
+          description: "Patient"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.patient_controller"
+
+  /user/info:
+    get:
+      tags:
+      - "user"
+      summary: "Get user info"
+      operationId: "get_user_info"
+      parameters: []
+      responses:
+        "200":
+          description: "User info"
+          schema:
+            $ref: "#/definitions/TokenData"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.user_controller"
+  /auth/login/email:
+    post:
+      tags:
+      - "auth"
+      summary: "User login"
+      operationId: "login"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User data"
+        required: true
+        schema:
+          $ref: "#/definitions/UserData"
+      responses:
+        "200":
+          description: "JWT token"
+          schema:
+            $ref: "#/definitions/TokenData"
+        "400":
+          description: "Invalid status value"
+      x-swagger-router-controller: "swagger_server.controllers.auth_controller"
+  /auth/logout:
+    post:
+      tags:
+      - "auth"
+      summary: "User logout"
+      operationId: "logout"
+      parameters: []
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.auth_controller"
+  /auth/password/change:
+    post:
+      tags:
+      - "auth"
+      summary: "User change password"
+      operationId: "change_password"
+      parameters:
+      - name: "email"
+        in: "query"
+        description: "User email"
+        required: true
+        type: "string"
+      - name: "newPassword"
+        in: "query"
+        description: "User new password"
+        required: true
+        type: "string"
+      - name: "recoveryCode"
+        in: "query"
+        description: "Recovery code from recovery letter"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Invalid status value"
+      x-swagger-router-controller: "swagger_server.controllers.auth_controller"
+  /auth/password/recovery:
+    post:
+      tags:
+      - "auth"
+      summary: "Recovery password"
+      operationId: "recovery_password"
+      parameters:
+      - name: "email"
+        in: "query"
+        description: "User email"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Invalid status value"
+      x-swagger-router-controller: "swagger_server.controllers.auth_controller"
+  /auth/password/recovery/check:
+    post:
+      tags:
+      - "auth"
+      summary: "Recovery password check"
+      operationId: "check_recovery_password"
+      parameters:
+      - name: "email"
+        in: "query"
+        description: "User email"
+        required: true
+        type: "string"
+      - name: "recoveryCode"
+        in: "query"
+        description: "Recovery code from recovery letter"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "OK"
+        "400":
+          description: "Invalid status value"
+      x-swagger-router-controller: "swagger_server.controllers.auth_controller"
+securityDefinitions:
+  JWT:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+    x-apikeyInfoFunc: "swagger_server.controllers.auth_controller.decode_token"
+definitions:
+  TokenData:
+    type: "object"
+    properties:
+      token:
+        type: "string"
+      accessExpiresIn:
+        type: "integer"
+      email:
+        type: "string"
+      first_name:
+        type: "string"
+      family_name:
+        type: "string"
+      role:
+        type: "string"
+    example:
+      role: "role"
+      accessExpiresIn: 0
+      first_name: "first_name"
+      family_name: "family_name"
+      email: "email"
+      token: "token"
+  UserData:
+    type: "object"
+    properties:
+      password:
+        type: "string"
+      email:
+        type: "string"
