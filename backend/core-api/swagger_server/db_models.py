@@ -19,3 +19,19 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
+
+
+class Patient(db.Model):
+    id = db.Column(db.String(128), primary_key=True)
+
+    name = db.Column(db.String(128))
+
+    studies = db.relationship('Study', backref='patient', lazy='dynamic')
+
+
+class Study(db.Model):
+    id = db.Column(db.String(128), primary_key=True)
+
+    patient_id = db.Column(db.String(128), db.ForeignKey('patient.id'))
+
+    date = db.Column(db.DateTime)

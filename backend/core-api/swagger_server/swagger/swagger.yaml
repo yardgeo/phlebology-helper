@@ -18,13 +18,18 @@ schemes:
 - "https"
 - "http"
 paths:
-  /dicom/preview:
+  /dicom/{study}/dir:
     get:
       tags:
       - "dicom"
       summary: "Get patients ids"
       operationId: "preview"
-      parameters: []
+      parameters:
+      - in: "path"
+        type: string
+        name: "study"
+        description: "Studi id"
+        required: true
       responses:
         "200":
           description: "preview"
@@ -34,7 +39,61 @@ paths:
           description: "Invalid status value"
       security:
       - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.dicom_controller"
+
+  /patient/{patientId}/studies/list:
+    get:
+      tags:
+      - "patient"
+      summary: "Get patients ids"
+      operationId: "get_studies"
+      parameters:
+      - in: "path"
+        type: string
+        name: "patientId"
+        description: "Patient id"
+        required: true
+      responses:
+        "200":
+          description: "Studies"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Study"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
       x-swagger-router-controller: "swagger_server.controllers.patient_controller"
+
+  /patient/{patientId}/studies/{studyId}:
+    get:
+      tags:
+      - "patient"
+      summary: "Get patient by id"
+      operationId: "get_studies_by_id"
+      parameters:
+      - in: "path"
+        type: string
+        name: "patientId"
+        description: "Patient id"
+        required: true
+      - in: "path"
+        type: string
+        name: "studyId"
+        description: "Studi id"
+        required: true
+      responses:
+        "200":
+          description: "Study"
+          schema:
+            $ref: "#/definitions/Study"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.patient_controller"
+
   /patient/list:
     get:
       tags:
@@ -45,6 +104,10 @@ paths:
       responses:
         "200":
           description: "Patients id"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Patient"
         "400":
           description: "Invalid status value"
       security:
@@ -66,6 +129,8 @@ paths:
       responses:
         "200":
           description: "Patient"
+          schema:
+            $ref: "#/definitions/Patient"
         "400":
           description: "Invalid status value"
       security:
@@ -230,3 +295,24 @@ definitions:
         type: "string"
       email:
         type: "string"
+
+  Study:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      studyDate:
+        type: "string"
+        format: "date-time"
+
+  Patient:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      studies:
+        type: array
+        items:
+          $ref: "#/definitions/Study"

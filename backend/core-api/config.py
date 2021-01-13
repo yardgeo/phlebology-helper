@@ -25,3 +25,8 @@ class Config(object):
     SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD') or 'admin_mail'
     SMTP_HOST = os.environ.get('SMTP_HOST') or 'smtp.gmail.com'
     SMTP_PORT = os.environ.get('SMTP_PORT') or 587
+
+    # orthanc
+    ORTHANC_USER = os.environ.get('ORTHANC_USER') or 'orthancUser'
+    ORTHANC_PASSWORD = os.environ.get('ORTHANC_PASSWORD') or 'orthancSecretPassword'
+    ORTHANC_URL = os.environ.get('ORTHANC_URL') or 'http://20.56.16.251:8042/'
