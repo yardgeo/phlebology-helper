@@ -80,7 +80,7 @@
     }
 
     export default {
-        name: 'dwv',
+        name: 'dwv2',
         components: {
             tagsTable
         },

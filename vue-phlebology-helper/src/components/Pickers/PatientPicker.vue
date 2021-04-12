@@ -1,17 +1,17 @@
 <template>
-    <v-select
+    <v-autocomplete
             v-model="model"
             :items="patients"
-            item-value="ID"
-            item-text="MainDicomTags.PatientName"
-            label="Паиценты"
+            item-value="id"
+            item-text="name"
+            label="Пациент"
             hide-details
             :menu-props="{ closeOnClick: true }"
     >
         <template v-slot:selection="{ item }">
-            <span>{{ item.MainDicomTags.PatientName }}</span>
+            <span>{{ item.name }}</span>
         </template>
-    </v-select>
+    </v-autocomplete>
 </template>
 
 <script>
@@ -27,14 +27,16 @@
                 get() {
                     return this.patientsId;
                 },
-                set(value) {
+                async set(value) {
                     this.selectPatient(value);
+                    await this.fetchStudies(value);
                 }
             }
         },
         methods: {
             ...mapActions("Dicom", [
                 "fetchPatients",
+                "fetchStudies",
                 "selectPatient"
             ]),
         },
