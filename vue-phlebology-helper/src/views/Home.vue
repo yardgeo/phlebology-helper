@@ -21,34 +21,37 @@
                 </v-card>
             </v-col>
             <v-col
-                    cols="8"
+                    cols="6"
+                    offset="1"
 
             >
                 <v-row
                         align="center"
                         justify="center"
                 >
-                    <v-card min-width="600px" min-height="600px">
+                    <v-card :loading="!this.loadFinish" flex-grow-1>
                         <v-container fluid>
-                            <v-row align="start" justify="center">
-                                <v-col>
+                            <v-row align="start" justify="center" no-gutters>
+                                <v-col cols="11">
                                     <div id="dwv">
-                                        <div class="layerContainer">
+                                    <div class="layerContainer">
                                             <canvas class="imageLayer" id="canvas1"></canvas>
                                             <div class="drawDiv"></div>
                                         </div>
                                     </div>
-                                    <v-card-text class="pt-5">
-                                        <v-slider
-                                                v-if="loadItem > 0"
-                                                label="Срез"
-                                                v-model="slice"
-                                                :max="loadItem"
-                                        >
-                                        </v-slider>
-                                    </v-card-text>
+                                    <SeriesScroller  @changeCurrentSliceNumberFromSlider="changeCurrentSliceNumberFromSlider"/>
+<!--                                    <v-card-text class="pt-5">-->
+<!--                                        <v-slider-->
+<!--                                                v-if="loadItem > 0"-->
+<!--                                                label="Срез"-->
+<!--                                                v-model="slice"-->
+<!--                                                :max="loadItem"-->
+<!--                                        >-->
+<!--                                        </v-slider>-->
+<!--                                    </v-card-text>-->
                                 </v-col>
                                 <v-col
+                                        cols="1"
                                         v-if="this.rotation > -1">
                                     <v-btn-toggle
                                             color="black"
@@ -67,17 +70,19 @@
                                         <v-btn
                                                 x-large
                                                 icon
+                                                :disabled="chosenStudy.series.length < 2"
                                         >
                                             <v-icon>mdi-axis-y-arrow</v-icon>
                                         </v-btn>
                                         <v-btn
                                                 x-large
                                                 icon
+                                                :disabled="chosenStudy.series.length < 3"
                                         >
                                             <v-icon>mdi-axis-z-arrow</v-icon>
                                         </v-btn>
                                     </v-btn-toggle>
-                                    <div class="my-5">
+                                    <div class="mt-4">
                                         <v-btn
                                                 x-large
                                                 icon
@@ -87,7 +92,7 @@
                                             <v-icon>mdi-fountain-pen</v-icon>
                                         </v-btn>
                                     </div>
-                                    <div class="my-5">
+                                    <div class="mt-4">
                                         <v-btn
                                                 x-large
                                                 icon
@@ -96,7 +101,7 @@
                                             <v-icon>mdi-magnify-plus-outline</v-icon>
                                         </v-btn>
                                     </div>
-                                    <div class="my-5">
+                                    <div class="mt-4">
                                         <v-btn
                                                 x-large
                                                 icon
@@ -105,16 +110,16 @@
                                             <v-icon>mdi-magnify-minus-outline</v-icon>
                                         </v-btn>
                                     </div>
-                                    <div class="my-5">
+                                    <div class="mt-4">
                                         <v-btn
                                                 x-large
                                                 icon
-                                                @click="reset"
+                                                @click="saveState"
                                         >
-                                            <v-icon>mdi-reload</v-icon>
+                                            <v-icon>mdi-content-save</v-icon>
                                         </v-btn>
                                     </div>
-                                    <div class="my-5">
+                                    <div class="mt-4">
                                         <v-btn
                                                 x-large
                                                 icon
@@ -123,18 +128,25 @@
                                             <v-icon>mdi-download</v-icon>
                                         </v-btn>
                                     </div>
+                                    <div class="mt-4">
+                                        <v-btn
+                                                x-large
+                                                icon
+                                                @click="pastPrev"
+                                        >
+                                            <v-icon>mdi-content-paste</v-icon>
+                                        </v-btn>
+                                    </div>
+                                </v-col>
+                                <v-col cols="12">
+<!--                                    <SeriesScroller/>-->
                                 </v-col>
                             </v-row>
-                            <v-row></v-row>
                         </v-container>
                     </v-card>
                 </v-row>
-                <v-row>
-                </v-row>
-
             </v-col>
-            <canvas id="test" height="1000px" width="1000px"></canvas>
-
+            <canvas id="downloadCanvas" width="564px" height="564px"></canvas>
         </v-row>
     </v-container>
 </template>
@@ -142,10 +154,24 @@
 <script>
     import PatientPicker from "../components/Pickers/PatientPicker"
     import StudyScroller from "../components/Pickers/StudyScroller"
+    import SeriesScroller from "../components/Pickers/SeriesScroller";
     import dwv from 'dwv';
-    var fs=require('fs');
 
     dwv.gui.getElement = dwv.gui.base.getElement;
+    // prompt
+    // (no direct assign to avoid Illegal invocation error
+    // see: https://stackoverflow.com/questions/9677985/uncaught-typeerror-illegal-invocation-in-chrome)
+    dwv.gui.prompt = function (message, def) {
+        return prompt(message, def)
+    };
+
+    // Image decoders (for web workers)
+    dwv.image.decoderScripts = {
+        jpeg2000: 'assets/dwv/decoders/pdfjs/decode-jpeg2000.js',
+        'jpeg-lossless': 'assets/dwv/decoders/rii-mango/decode-jpegloss.js',
+        'jpeg-baseline': 'assets/dwv/decoders/pdfjs/decode-jpegbaseline.js',
+        rle: 'assets/dwv/decoders/dwv/decode-rle.js'
+    };
 
 
     import AuthService from '@/services/auth.service';
@@ -153,15 +179,18 @@
 
     export default {
         name: "Dashboard",
-        components: {StudyScroller, PatientPicker},
+        components: {StudyScroller, PatientPicker, SeriesScroller},
         data() {
             return {
+                model:null,
                 dwvApp: null,
                 test: 0,
                 loadItem: 0,
+                loadFinish: true,
                 drawStatus: false,
                 drawButtonColor: "white",
                 currentRotate: -1,
+                currentSeries: null,
                 tools: {
                     Scroll: {},
                     ZoomAndPan: {},
@@ -181,7 +210,9 @@
             ...mapGetters({
                 chosenPatient: 'Dicom/getChosenPatient',
                 chosenStudy: 'Dicom/getChosenStudy',
-                studies: 'Dicom/getStudies'
+                studies: 'Dicom/getStudies',
+                chosenSeries: "Dicom/getChosenSeries",
+                sliceNumber: "Dicom/getCurrentSliceNumber"
             }),
             rotation: {
                 get() {
@@ -211,18 +242,21 @@
         },
         methods: {
             ...mapActions("Dicom", [
-                "fetchStudies"
+                "fetchStudies",
+                "uploadState",
+                "selectSeries",
+                "changeCurrentSliceNumber"
             ]),
             download() {
                 let filename = "test.png";
-                let canvas = document.getElementById("test");
+                let canvas = document.getElementById("downloadCanvas");
                 let canvas1 = document.getElementById("canvas1");
                 let canvas2 = document.getElementsByClassName("konvajs-content")[0].children[0];
 
                 var context = canvas.getContext('2d');
-                canvas1.width = 1000; // in pixels
-                canvas1.height = 1000; // in pixels
+
                 context.drawImage(canvas1, 0, 0);
+                context.scale(0.5, 0.5);
                 context.drawImage(canvas2, 0, 0);
                 /// create an "off-screen" anchor tag
                 var lnk = document.createElement('a'), e;
@@ -248,67 +282,101 @@
                     lnk.fireEvent("onclick");
                 }
             },
-            loadJSON(callback) {
-                var xobj = new XMLHttpRequest();
-                xobj.overrideMimeType("application/json");
-                xobj.open('GET', 'my_data.json', true);
-                // Replace 'my_data' with the path to your file
-                xobj.onreadystatechange = function () {
-                    if (xobj.readyState === 4 && xobj.status === 200) {
-                        // Required use of an anonymous callback
-                        // as .open() will NOT return a value but simply returns undefined in asynchronous mode
-                        callback(xobj.responseText);
-                    }
-                }
-                    xobj.send(null);
-            },
-            reset() {
-                console.log(this.dwvApp.getState());
-                console.log("sdfd");
-                var data=fs.readFileSync('../assets/test.json', 'utf8');
-                this.dwvApp.loadFiles([data]);
+            pastPrev() {
+                this.drawOff();
 
-                this.dwvApp.resetDisplay();
+                let state = JSON.parse(this.dwvApp.getState());
+                let current_position = this.dwvApp.getViewController().getCurrentPosition();
+                let current_frame = this.dwvApp.getViewController().getCurrentFrame();
+
+                const current_id = `slice-${current_position.k}_frame-${current_frame}`;
+                const pred_id = `slice-${current_position.k - 1}_frame-${current_frame}`;
+
+                // find previous drawing
+                const i = state.drawings.children.findIndex(draw => draw.attrs.id === pred_id);
+                if (i === -1) {
+                    return ;
+                }
+
+                // create new drawing
+                let new_draw = state.drawings;
+                new_draw.children = [state.drawings.children[i]];
+                new_draw.children[0].attrs.id = current_id;
+
+                this.dwvApp.setDrawings(new_draw, null);
+            },
+            async saveState() {
+                this.drawOff();
+                let uploadStateResponse = false;
+                await this.uploadState({
+                    series_id: this.currentSeries.id,
+                    state: JSON.parse(this.dwvApp.getState())
+                }).then((response) => uploadStateResponse = response);
+                if (uploadStateResponse) {
+                    await this.$store.dispatch('Snackbar/set', 'Маска успешно сохранена');
+                } else {
+                    await this.$store.dispatch('Snackbar/set', 'Произолша ошибка!');
+                }
             },
             zoomPlus() {
+                this.drawOff();
                 this.dwvApp.setTool("ZoomAndPan");
                 this.dwvApp.stepZoom(0.1, 250, 250);
             },
             zoomMinus() {
+                this.drawOff();
                 this.dwvApp.setTool("ZoomAndPan");
                 this.dwvApp.stepZoom(-0.1, 250, 250);
 
             },
             drawClick() {
-                this.drawStatus = !this.drawStatus;
-                if (this.drawStatus === true) {
+                if (!this.drawStatus) {
                     this.drawOn();
                 } else {
                     this.drawOff();
                 }
             },
             drawOn() {
+                this.drawStatus = true;
                 this.drawButtonColor = 'orange darken-2';
                 this.dwvApp.setTool("Draw");
                 this.dwvApp.setDrawShape(this.tools.Draw.options[0]);
             },
             drawOff() {
+                this.drawStatus = false;
                 this.drawButtonColor = 'white';
                 this.dwvApp.setTool("Scroll");
             },
-            addDicom(i) {
+            async addDicom(i) {
+
+                // if (this.currentRotate === i) {
+                //     return;
+                // }
 
                 let urls = [];
 
+                await this.selectSeries(i);
+
                 this.chosenStudy.series[i].instances.forEach((ins) => {
-                    urls.push(process.env.VUE_APP_API_BASE_URL + 'dicom/' + ins)
+                    urls.push(process.env.VUE_APP_API_BASE_URL + 'dicom/' + ins.id)
                 });
 
                 this.currentRotate = i;
+                this.currentSeries = this.chosenStudy.series[i];
 
                 this.dwvApp.loadURLs(urls,
                     [{name: "Authorization", value: 'Bearer ' + AuthService.checkAccessToken()}],
                     true);
+            },
+            changeCurrentSliceNumberFromSlider(i) {
+                if (this.dwvApp === null || this.dwvApp.getViewController() === null) {
+                    return;
+                }
+                this.drawOff();
+                let pos = this.dwvApp.getViewController().getCurrentPosition();
+                pos.k = i;
+                this.changeCurrentSliceNumber(pos.k);
+                this.dwvApp.getViewController().setCurrentPosition(pos);
             }
         },
         mounted() {
@@ -323,17 +391,33 @@
             this.dwvApp.setTool("Scroll");
             let nReceivedError = null;
             let nReceivedAbort = null;
-            this.dwvApp.addEventListener('load-end', (/*event*/) => {
+            this.dwvApp.addEventListener('load-end', (event) => {
                 console.log(this.loadItem, nReceivedError, nReceivedAbort);
                 let pos = this.dwvApp.getViewController().getCurrentPosition();
                 pos.k = 0;
-                this.test = 0;
                 this.dwvApp.getViewController().setCurrentPosition(pos);
+                if (event.loadtype !== "image") {
+                    this.loadFinish=true;
+                    return;
+                }
+                this.changeCurrentSliceNumber(0);
                 --this.loadItem;
+                if (this.currentSeries.hasState) {
+                    let urls = [process.env.VUE_APP_API_BASE_URL + 'series/' + this.chosenSeries.id + "/state.json"];
+                    this.dwvApp.loadURLs(urls,
+                        [{name: "Authorization", value: 'Bearer ' + AuthService.checkAccessToken()},
+                            {name: "Content-Type", value: 'application/json'}],
+                        true);
+                }
+                this.loadFinish=true;
+                console.log(this.dwvApp.getLayerContainerSize());
             });
 
-            this.dwvApp.addEventListener('load-start', (/*event*/) => {
-                this.loadItem = 0;
+            this.dwvApp.addEventListener('load-start', (event) => {
+                if (event.loadtype === "image") {
+                    this.loadItem = 0;
+                    this.loadFinish=false;
+                }
                 nReceivedError = 0;
                 nReceivedAbort = 0;
             });
@@ -357,23 +441,23 @@
                     pos = this.dwvApp.getViewController().getCurrentPosition();
                     ++pos.k;
                     this.test++;
+                    this.changeCurrentSliceNumber(pos.k);
                     this.dwvApp.getViewController().setCurrentPosition(pos);
                 } else if (event.code === "ArrowLeft" && this.dwvApp.getViewController().getCurrentPosition().k > 0) {
                     this.drawOff();
                     pos = this.dwvApp.getViewController().getCurrentPosition();
                     --pos.k;
-                    this.test--;
+                    this.changeCurrentSliceNumber(pos.k);
                     this.slice = pos.k;
                     this.dwvApp.getViewController().setCurrentPosition(pos);
                 }
                 this.dwvApp.defaultOnKeydown(event);
             });
 
-            // possible load from location
-            dwv.utils.loadFromUri(window.location.href, this.dwvApp);
             // handle window resize
-            window.addEventListener('resize', this.dwvApp.onResize)
+            window.addEventListener('resize', this.dwvApp.onResize);
 // load dicom data
+//             this.simpleLoad();
 
         }
     }
@@ -382,21 +466,29 @@
 <style scoped>
     #dwv {
         font-family: Arial, Helvetica, sans-serif;
-        height: 90%;
+        height: 564px;
     }
 
-    ::-webkit-scrollbar {
-        width: 0;
-        background: transparent;
+    .imageLayer {
+        position: absolute;
+        left: 0px;
     }
 
-    ::-webkit-scrollbar-thumb {
-        background: transparent;
+    .drawDiv {
+        position: absolute;
+        pointer-events: none;
     }
 
     .layerContainer {
-        min-width: 500px;
-        min-height: 500px;
+        position: relative;
+        padding: 0;
+        margin: auto;
+        text-align: center;
+    }
+
+    #downloadCanvas {
+        width: 0px;
+        height: 0px;
     }
 
     /* Layers */

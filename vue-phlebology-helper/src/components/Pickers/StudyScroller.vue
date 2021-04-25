@@ -68,8 +68,8 @@
             randomColor() {
                 return this.colors[this.genRandomIndex(this.colors.length)];
             },
-            chooseStudy(index) {
-                this.selectStudy(index);
+            async chooseStudy(index) {
+                await this.selectStudy(index);
                 this.$emit('addDicom');
             }
         },
