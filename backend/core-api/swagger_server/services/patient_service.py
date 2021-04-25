@@ -1,32 +1,26 @@
-import requests
 import datetime
-from io import BytesIO
+import json
 
 # db
 from swagger_server.app import db
-from swagger_server.db_models import Patient, Study
+from swagger_server.db_models import Patient, Study, Instance, Series
 
-# config & utils
-from config import Config
+# services
+from swagger_server.services.orthanc_service import OrthancClient
 
-# config parameters
-ORTHANC_USER = Config.ORTHANC_USER
-ORTHANC_PASSWORD = Config.ORTHANC_PASSWORD
-ORTHANC_URL = Config.ORTHANC_URL
+# logger
+from swagger_server import logger
+
+orthancClient = OrthancClient()
 
 
 def get_patients():
-    session = requests.Session()
-    session.auth = (ORTHANC_USER, ORTHANC_PASSWORD)
-
-    response = session.get(ORTHANC_URL + 'patients/')
-    patient_ids = response.json()
+    patient_ids = orthancClient.get_patients()
 
     db_patient_ids = [patient.id for patient in db.session().query(Patient).all()]
 
     for patient_id in set(patient_ids).difference(set(db_patient_ids)):
-        response = session.get(ORTHANC_URL + 'patients/' + patient_id)
-        orthanc_patient = response.json()
+        orthanc_patient = orthancClient.get_patient_by_id(patient_id=patient_id)
         db.session().add(Patient(id=patient_id,
                                  name=orthanc_patient.get("MainDicomTags").get("PatientName")))
 
@@ -41,39 +35,90 @@ def get_patient_by_id(id):
 
 
 def get_studies(patient_id):
-    session = requests.Session()
-    session.auth = (ORTHANC_USER, ORTHANC_PASSWORD)
+    study_ids = orthancClient.get_patient_by_id(patient_id=patient_id).get("Studies")
 
-    response = session.get(ORTHANC_URL + 'patients/' + patient_id)
-    study_ids = response.json().get("Studies")
+    db_patient = Patient.query.filter(Patient.id == patient_id).first()
 
-    patient = db.session().query(Patient).filter(Patient.id == patient_id).first()
+    db_studies = []
+    if db_patient:
+        db_studies = db_patient.studies
 
-    studies = db.session().query(Study).filter(Study.patient_id == patient_id).all()
-
-    db_study_ids = [study.id for study in studies]
+    db_study_ids = [study.id for study in db_studies]
 
     for study_id in set(study_ids).difference(set(db_study_ids)):
-        response = session.get(ORTHANC_URL + 'studies/' + study_id)
-        orthanc_study = response.json()
+        orthanc_study = orthancClient.get_study_by_id(study_id=study_id)
         date = orthanc_study.get("MainDicomTags").get("StudyDate")
+
         date = datetime.datetime.strptime(date, "%Y%m%d").date().isoformat()
-        db.session().add(Study(id=study_id,
-                               date=date,
-                               patient=patient))
+        db_study = Study(id=study_id,
+                         date=date,
+                         description=orthanc_study.get("MainDicomTags").get("StudyDescription"),
+                         patient=db_patient)
+        db.session().add(db_study)
 
     db.session().commit()
 
     return db.session().query(Study).filter(Study.patient_id == patient_id).all()
 
 
+def get_series(study_id):
+    series_ids = orthancClient.get_study_by_id(study_id=study_id).get("Series")
+
+    db_study = Study.query.filter(Study.id == study_id).first()
+    db_series = []
+
+    if db_study:
+        db_series = db_study.series
+
+    db_series_ids = [s.id for s in db_series]
+    for series_id in set(series_ids).difference(set(db_series_ids)):
+        series = orthancClient.get_series_by_id(series_id)
+        db.session().add(Series(id=series_id,
+                                study_id=study_id,
+                                orientation=series.get("MainDicomTags").get("ImageOrientationPatient")))
+
+        instances = series.get("Instances")
+        for i, instance in enumerate(instances):
+            db.session().add(Instance(id=instance,
+                                      order=i,
+                                      preview=orthancClient.download_preview_by_id(instance),
+                                      series_id=series_id))
+
+    db.session().commit()
+    return Series.query.filter(Series.study_id == study_id).all()
+
+
+def get_series_by_id(id):
+    return Series.query.filter(Series.id == id).first()
+
+
 def get_study_by_id(id):
-    return db.session().query(Study).filter(Study.id == id).first()
+    get_series(study_id=id)
+    return Study.query.filter(Study.id == id).first()
 
 
-def get_media(study_id):
-    session = requests.Session()
-    session.auth = (ORTHANC_USER, ORTHANC_PASSWORD)
+def get_dicom_media(id):
+    return orthancClient.download_dicom_by_id(instance_id=id)
 
-    response = session.get(ORTHANC_URL + 'studies/' + study_id + "/media")
-    return BytesIO(response.content)
+
+def preview(id):
+    return orthancClient.download_preview_by_id(instance_id=id)
+
+
+def upload_original_state(series_id, state):
+    db_series = Series.query.filter(Series.id == series_id).first()
+
+    if db_series is None:
+        return False
+
+    db_series.original_state = json.dumps(state)
+    db.session().commit()
+
+
+def get_original_state(series_id):
+    db_series = Series.query.filter(Series.id == series_id).first()
+
+    if not db_series.original_state:
+        return None
+
+    return json.loads(db_series.original_state)

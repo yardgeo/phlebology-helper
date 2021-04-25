@@ -1,0 +1,242 @@
+{
+  "version": "0.3",
+  "window-center": 484.33,
+  "window-width": 841.68,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 7
+  },
+  "scale": 1.3097599999999947,
+  "scaleCenter": {
+    "x": 222,
+    "y": 343
+  },
+  "translation": {
+    "x": -36.76935886761031,
+    "y": 25.578684429641953
+  },
+  "drawings": {
+    "attrs": {
+      "listening": false,
+      "hitGraphEnabled": false,
+      "visible": true
+    },
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-0_frame-0",
+          "visible": false
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "freeHand-group",
+              "visible": true,
+              "id": "4ryfxk9s2im"
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "points": [
+                    344,
+                    218,
+                    335,
+                    227,
+                    325,
+                    257,
+                    358,
+                    246,
+                    365,
+                    214,
+                    339,
+                    219
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 2.048,
+                  "name": "shape",
+                  "tension": 0.5
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 344,
+                  "y": 228,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 12.288,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "height": 12.288
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-1_frame-0",
+          "visible": false
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "freeHand-group",
+              "visible": true,
+              "id": "8ovjm5imeaq"
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "points": [
+                    347,
+                    229,
+                    241,
+                    378,
+                    182,
+                    217
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 2.048,
+                  "name": "shape",
+                  "tension": 0.5
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 347,
+                  "y": 239,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 12.288,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "height": 12.288
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-7_frame-0",
+          "visible": true
+        },
+        "className": "Group",
+        "children": [
+          {
+            "attrs": {
+              "name": "freeHand-group",
+              "visible": true,
+              "id": "rwyyr25s7e"
+            },
+            "className": "Group",
+            "children": [
+              {
+                "attrs": {
+                  "points": [
+                    332,
+                    211,
+                    332,
+                    220,
+                    345,
+                    225,
+                    341,
+                    215,
+                    332,
+                    212
+                  ],
+                  "stroke": "#ffff80",
+                  "strokeWidth": 2.048,
+                  "name": "shape",
+                  "tension": 0.5
+                },
+                "className": "Line"
+              },
+              {
+                "attrs": {
+                  "x": 332,
+                  "y": 221,
+                  "name": "label"
+                },
+                "className": "Label",
+                "children": [
+                  {
+                    "attrs": {
+                      "fontSize": 12.288,
+                      "fontFamily": "Verdana",
+                      "fill": "#ffff80",
+                      "name": "text"
+                    },
+                    "className": "Text"
+                  },
+                  {
+                    "attrs": {
+                      "height": 12.288
+                    },
+                    "className": "Tag"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "4ryfxk9s2im": {
+      "textExpr": "",
+      "longText": "",
+      "quant": null
+    },
+    "8ovjm5imeaq": {
+      "textExpr": "",
+      "longText": "",
+      "quant": null
+    },
+    "rwyyr25s7e": {
+      "textExpr": "",
+      "longText": "",
+      "quant": null
+    }
+  }
+}

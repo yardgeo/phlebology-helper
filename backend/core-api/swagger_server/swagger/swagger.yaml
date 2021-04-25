@@ -14,20 +14,24 @@ tags:
   description: "patientInfo"
 - name: "dicom"
   description: "dicomInfo"
+- name: "series"
+  description: "seriesInfo"
+- name: "study"
+  description: "studyInfo"
 schemes:
 - "https"
 - "http"
 paths:
-  /dicom/{study}/dir:
+  /dicom/{id}:
     get:
       tags:
       - "dicom"
-      summary: "Get patients ids"
-      operationId: "preview"
+      summary: "Download dicom image"
+      operationId: "download_dicom"
       parameters:
       - in: "path"
         type: string
-        name: "study"
+        name: "id"
         description: "Studi id"
         required: true
       responses:
@@ -40,6 +44,77 @@ paths:
       security:
       - JWT: []
       x-swagger-router-controller: "swagger_server.controllers.dicom_controller"
+  /dicom/{id}/preview:
+    get:
+      tags:
+      - "dicom"
+      summary: "Preview dicom image"
+      operationId: "preview"
+      parameters:
+      - in: "path"
+        type: string
+        name: "id"
+        description: "Studi id"
+        required: true
+      responses:
+        "200":
+          description: "preview"
+          schema:
+            type: string
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.dicom_controller"
+  /series/{seriesId}/state.json:
+    get:
+      tags:
+      - "series"
+      summary: "Get series state"
+      operationId: "get_state"
+      parameters:
+      - in: "path"
+        type: string
+        name: "seriesId"
+        description: "Series id"
+        required: true
+      responses:
+        "200":
+          description: "get serie state"
+          schema:
+            type: object
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.series_controller"
+
+  /series/{seriesId}/state:
+    post:
+      tags:
+      - "series"
+      summary: "Upload series state"
+      operationId: "upload_state"
+      parameters:
+      - in: "path"
+        type: string
+        name: "seriesId"
+        description: "Series id"
+        required: true
+      - in: "body"
+        name: "state"
+        description: "State"
+        required: true
+        schema:
+          type: object
+      responses:
+        "200":
+          description: "ok"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.series_controller"
 
   /patient/{patientId}/studies/list:
     get:
@@ -66,22 +141,40 @@ paths:
       - JWT: []
       x-swagger-router-controller: "swagger_server.controllers.patient_controller"
 
-  /patient/{patientId}/studies/{studyId}:
+  /series/{seriesId}:
     get:
       tags:
-      - "patient"
-      summary: "Get patient by id"
-      operationId: "get_studies_by_id"
+      - "series"
+      summary: "Get series by id"
+      operationId: "get_series_by_id"
       parameters:
       - in: "path"
         type: string
-        name: "patientId"
-        description: "Patient id"
+        name: "seriesId"
+        description: "series id"
         required: true
+      responses:
+        "200":
+          description: "Series"
+          schema:
+            $ref: "#/definitions/Series"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.series_controller"
+
+  /studies/{studyId}:
+    get:
+      tags:
+      - "study"
+      summary: "Get study by id"
+      operationId: "get_study_by_id"
+      parameters:
       - in: "path"
         type: string
         name: "studyId"
-        description: "Studi id"
+        description: "Study id"
         required: true
       responses:
         "200":
@@ -92,7 +185,7 @@ paths:
           description: "Invalid status value"
       security:
       - JWT: []
-      x-swagger-router-controller: "swagger_server.controllers.patient_controller"
+      x-swagger-router-controller: "swagger_server.controllers.study_controller"
 
   /patient/list:
     get:
@@ -296,14 +389,42 @@ definitions:
       email:
         type: "string"
 
+  Series:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      orientation:
+        type: "string"
+      hasState:
+        type: boolean
+      instances:
+        type: array
+        items:
+          $ref: "#/definitions/Instance"
+
   Study:
     type: "object"
     properties:
       id:
         type: "string"
+      description:
+        type: "string"
+      series:
+        type: array
+        items:
+          $ref: "#/definitions/Series"
       studyDate:
         type: "string"
         format: "date-time"
+
+  Instance:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      preview:
+        type: string
 
   Patient:
     type: "object"

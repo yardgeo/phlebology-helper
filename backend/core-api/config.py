@@ -3,7 +3,7 @@ import os
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://phlb_site:phlb_site@20.56.16.251:5432/viewer'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://phlb_viewer:phlb_viewer@130.193.52.22:5432/phlb_viewer'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_AS_ASCII = False
     RUN_PORT = os.environ.get('RUN_PORT') or 8080
@@ -29,4 +29,4 @@ class Config(object):
     # orthanc
     ORTHANC_USER = os.environ.get('ORTHANC_USER') or 'orthancUser'
     ORTHANC_PASSWORD = os.environ.get('ORTHANC_PASSWORD') or 'orthancSecretPassword'
-    ORTHANC_URL = os.environ.get('ORTHANC_URL') or 'http://20.56.16.251:8042/'
+    ORTHANC_URL = os.environ.get('ORTHANC_URL') or 'http://130.193.52.22:8042/'

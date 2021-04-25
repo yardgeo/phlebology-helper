@@ -26,7 +26,28 @@ class Patient(db.Model):
 
     name = db.Column(db.String(128))
 
-    studies = db.relationship('Study', backref='patient', lazy='dynamic')
+    studies = db.relationship('Study', backref='patient', lazy='selectin')
+
+
+class Instance(db.Model):
+    id = db.Column(db.String(128), primary_key=True)
+    order = db.Column(db.Integer())
+    preview = db.Column(db.Text())
+
+    series_id = db.Column(db.String(128), db.ForeignKey('series.id'))
+
+
+class Series(db.Model):
+    id = db.Column(db.String(128), primary_key=True)
+
+    study_id = db.Column(db.String(128), db.ForeignKey('study.id'))
+
+    instances = db.relationship('Instance', backref='series', lazy='selectin', order_by="Instance.order")
+
+    orientation = db.Column(db.String(128))
+
+    original_state = db.Column(db.JSON())
+    dynamic_state = db.Column(db.JSON())
 
 
 class Study(db.Model):
@@ -34,4 +55,8 @@ class Study(db.Model):
 
     patient_id = db.Column(db.String(128), db.ForeignKey('patient.id'))
 
+    series = db.relationship('Series', backref='study', lazy='selectin')
+
     date = db.Column(db.DateTime)
+
+    description = db.Column(db.String(128))

@@ -1,5 +1,6 @@
 import connexion
 import six
+import json
 
 from swagger_server import util
 
@@ -9,7 +10,7 @@ import swagger_server.services.patient_service as patient_service
 from flask import send_file
 
 
-def preview(study):  # noqa: E501
+def download_dicom(id):  # noqa: E501
     """Get patients ids
 
      # noqa: E501
@@ -19,5 +20,10 @@ def preview(study):  # noqa: E501
 
     :rtype: file
     """
-    file = patient_service.get_media(study)
-    return send_file(file, as_attachment=True, attachment_filename='temp.zip', mimetype='application/zip')
+    file = patient_service.get_dicom_media(id)
+    return send_file(file, as_attachment=True, attachment_filename=id + '.dcm', mimetype='application/dicom')
+
+
+def preview(id):
+    decoded_string = patient_service.preview(id)
+    return decoded_string

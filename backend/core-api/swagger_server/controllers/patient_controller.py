@@ -38,11 +38,6 @@ def get_patients_ids():  # noqa: E501
     return [converter_service.patient_to_model(db_patient) for db_patient in patients]
 
 
-# def preview():
-#     file = patient_service.preview()
-#     return send_file(file, as_attachment=True, attachment_filename='temp.dcm', mimetype='application/dicom')
-
-
 def get_studies(patientId):  # noqa: E501
     """Get patients ids
 
@@ -54,17 +49,3 @@ def get_studies(patientId):  # noqa: E501
 
     studies = patient_service.get_studies(patientId)
     return [converter_service.study_to_model(db_study) for db_study in studies]
-
-
-def get_studies_by_id(patientId, studyId):  # noqa: E501
-    """Get patient by id
-
-     # noqa: E501
-
-    :param id: Studi id
-    :type id: str
-
-    :rtype: None
-    """
-    db_study = patient_service.get_study_by_id(studyId)
-    return converter_service.study_to_model(db_study)

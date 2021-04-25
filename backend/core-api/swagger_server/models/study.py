@@ -5,6 +5,7 @@ from datetime import date, datetime  # noqa: F401
 
 from typing import List, Dict  # noqa: F401
 
+from swagger_server.models.series import Series  # noqa: E501
 from swagger_server.models.base_model_ import Model
 from swagger_server import util
 
@@ -15,25 +16,35 @@ class Study(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: str=None, study_date: datetime=None):  # noqa: E501
+    def __init__(self, id: str=None, description: str=None, series: List[Series]=None, study_date: datetime=None):  # noqa: E501
         """Study - a model defined in Swagger
 
         :param id: The id of this Study.  # noqa: E501
         :type id: str
+        :param description: The description of this Study.  # noqa: E501
+        :type description: str
+        :param series: The series of this Study.  # noqa: E501
+        :type series: List[Series]
         :param study_date: The study_date of this Study.  # noqa: E501
         :type study_date: datetime
         """
         self.swagger_types = {
             'id': str,
+            'description': str,
+            'series': List[Series],
             'study_date': datetime
         }
 
         self.attribute_map = {
             'id': 'id',
+            'description': 'description',
+            'series': 'series',
             'study_date': 'studyDate'
         }
 
         self._id = id
+        self._description = description
+        self._series = series
         self._study_date = study_date
 
     @classmethod
@@ -67,6 +78,48 @@ class Study(Model):
         """
 
         self._id = id
+
+    @property
+    def description(self) -> str:
+        """Gets the description of this Study.
+
+
+        :return: The description of this Study.
+        :rtype: str
+        """
+        return self._description
+
+    @description.setter
+    def description(self, description: str):
+        """Sets the description of this Study.
+
+
+        :param description: The description of this Study.
+        :type description: str
+        """
+
+        self._description = description
+
+    @property
+    def series(self) -> List[Series]:
+        """Gets the series of this Study.
+
+
+        :return: The series of this Study.
+        :rtype: List[Series]
+        """
+        return self._series
+
+    @series.setter
+    def series(self, series: List[Series]):
+        """Sets the series of this Study.
+
+
+        :param series: The series of this Study.
+        :type series: List[Series]
+        """
+
+        self._series = series
 
     @property
     def study_date(self) -> datetime:
