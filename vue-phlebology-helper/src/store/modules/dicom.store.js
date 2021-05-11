@@ -5,10 +5,12 @@ const initialState = () => ({
     patients: [],
     studies: [],
     patientIds: [],
-    chosenStudy: {},
+    chosenStudy: '',
     chosenSeries: null,
     chosenPatient: '',
     stateUploaded: false,
+    segmentData: [],
+    markedSlice: [],
     currentSliceNumber: 0,
 });
 
@@ -23,6 +25,12 @@ window.state = state;
 
 // VUEX GETTERS
 const getters = {
+    getSegmentData(state) {
+        return state.segmentData;
+    },
+    getMarkedSlices(state) {
+        return state.markedSlice;
+    },
     getCurrentSliceNumber(state) {
         return state.currentSliceNumber;
     },
@@ -50,12 +58,16 @@ const getters = {
 // VUEX ACTIONS
 const actions = {
     async selectStudy({commit}, index){
+        if (typeof index === 'undefined') {
+            return ;
+        }
         await API.get(`studies/${state.studies[index].id}`).then((response) => {
             commit("SELECT_STUDY", response);
         }).catch(e=>{console.log(e);});
     },
 
     async selectSeries({commit}, index){
+        commit("SET_MARKED_SLICE", []);
         await API.get(`series/${state.chosenStudy.series[index].id}`).then((response) => {
             commit("SELECT_SERIES", response);
         }).catch(e=>{console.log(e);});
@@ -68,9 +80,16 @@ const actions = {
     selectPatient({commit}, user){
         commit("SET_PATIENT", user);
     },
+
+    markSlice({commit}, drawInfo){
+        let slices = drawInfo.map(dI => dI.slice);
+        commit("SET_MARKED_SLICE", slices);
+    },
+
     async fetchPatients({commit}) {
 
         await API.get('patient/list').then((response) => {
+            console.log(response);
             commit('PATIENTS', response);
             response.forEach((patient) => commit('PATIENT_ID', patient.id))
         }).catch(e=>{console.log(e);});
@@ -83,8 +102,15 @@ const actions = {
       return true;
     },
 
+    async fetchSegment({commit}, id) {
+        await API.get(`dicom/${id}/segment`).then((response) => {
+            commit('FETCH_SEGMENT', response);
+        }).catch(e=>{console.log(e); return false;});
+        return true;
+    },
+
     async fetchStudies({commit}, id) {
-        console.log(id);
+        commit('SELECT_STUDY', {});
         await API.get(`patient/${id}/studies/list`).then((response) => {
             commit('STUDIES', response);
         }).catch(e=>{console.log(e);});
@@ -109,6 +135,9 @@ const mutations = {
     SET_PATIENT(state, value) {
         state.chosenPatient = value;
     },
+    SET_MARKED_SLICE(state, value) {
+        state.markedSlice = value;
+    },
     PATIENTS(state, value) {
         state.patients = value;
     },
@@ -120,6 +149,9 @@ const mutations = {
     },
     UPLOAD_STATE(state) {
         state.stateUploaded = true;
+    },
+    FETCH_SEGMENT(state, value) {
+        state.segmentData = value;
     },
     CHANGE_SLICE_NUMBER(state, value) {
       state.currentSliceNumber = value;

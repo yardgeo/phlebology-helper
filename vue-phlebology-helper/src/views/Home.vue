@@ -12,23 +12,17 @@
         </v-toolbar>
         <v-row>
             <v-col
-                    cols="4"
+                    cols="3"
             >
                 <v-card v-if="this.chosenPatient"
                         :loading="this.studies.length === 0"
                 >
-                    <study-scroller @addDicom="addDicom(0)"></study-scroller>
+                    <study-scroller></study-scroller>
                 </v-card>
             </v-col>
             <v-col
                     cols="6"
-                    offset="1"
-
             >
-                <v-row
-                        align="center"
-                        justify="center"
-                >
                     <v-card :loading="!this.loadFinish" flex-grow-1>
                         <v-container fluid>
                             <v-row align="start" justify="center" no-gutters>
@@ -39,49 +33,11 @@
                                             <div class="drawDiv"></div>
                                         </div>
                                     </div>
-                                    <SeriesScroller  @changeCurrentSliceNumberFromSlider="changeCurrentSliceNumberFromSlider"/>
-<!--                                    <v-card-text class="pt-5">-->
-<!--                                        <v-slider-->
-<!--                                                v-if="loadItem > 0"-->
-<!--                                                label="Срез"-->
-<!--                                                v-model="slice"-->
-<!--                                                :max="loadItem"-->
-<!--                                        >-->
-<!--                                        </v-slider>-->
-<!--                                    </v-card-text>-->
+                                    <InstancePicker  @changeCurrentSliceNumberFromSlider="changeCurrentSliceNumberFromSlider"/>
                                 </v-col>
                                 <v-col
                                         cols="1"
                                         v-if="this.rotation > -1">
-                                    <v-btn-toggle
-                                            color="black"
-                                            dark
-                                            dense
-                                            mandatory
-                                            v-model="rotation"
-                                            background-color="orange darken-2"
-                                    >
-                                        <v-btn
-                                                x-large
-                                                icon
-                                        >
-                                            <v-icon>mdi-axis-x-arrow</v-icon>
-                                        </v-btn>
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                :disabled="chosenStudy.series.length < 2"
-                                        >
-                                            <v-icon>mdi-axis-y-arrow</v-icon>
-                                        </v-btn>
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                :disabled="chosenStudy.series.length < 3"
-                                        >
-                                            <v-icon>mdi-axis-z-arrow</v-icon>
-                                        </v-btn>
-                                    </v-btn-toggle>
                                     <div class="mt-4">
                                         <v-btn
                                                 x-large
@@ -137,14 +93,25 @@
                                             <v-icon>mdi-content-paste</v-icon>
                                         </v-btn>
                                     </div>
-                                </v-col>
-                                <v-col cols="12">
-<!--                                    <SeriesScroller/>-->
+                                    <div class="mt-4">
+                                        <v-btn
+                                                x-large
+                                                icon
+                                                @click="autoSegment"
+                                        >
+                                            <v-icon>mdi-brightness-auto</v-icon>
+                                        </v-btn>
+                                    </div>
                                 </v-col>
                             </v-row>
                         </v-container>
                     </v-card>
-                </v-row>
+            </v-col>
+            <v-col cols="3" >
+                <v-card v-if="studyIsChosen"
+                >
+                    <SeriesPicker @addDicom="addDicom"/>
+                </v-card>
             </v-col>
             <canvas id="downloadCanvas" width="564px" height="564px"></canvas>
         </v-row>
@@ -154,7 +121,8 @@
 <script>
     import PatientPicker from "../components/Pickers/PatientPicker"
     import StudyScroller from "../components/Pickers/StudyScroller"
-    import SeriesScroller from "../components/Pickers/SeriesScroller";
+    import InstancePicker from "../components/Pickers/InstancePicker";
+    import SeriesPicker from "../components/Pickers/SeriesPicker";
     import dwv from 'dwv';
 
     dwv.gui.getElement = dwv.gui.base.getElement;
@@ -179,7 +147,7 @@
 
     export default {
         name: "Dashboard",
-        components: {StudyScroller, PatientPicker, SeriesScroller},
+        components: {StudyScroller, PatientPicker, InstancePicker, SeriesPicker},
         data() {
             return {
                 model:null,
@@ -212,8 +180,15 @@
                 chosenStudy: 'Dicom/getChosenStudy',
                 studies: 'Dicom/getStudies',
                 chosenSeries: "Dicom/getChosenSeries",
-                sliceNumber: "Dicom/getCurrentSliceNumber"
+                sliceNumber: "Dicom/getCurrentSliceNumber",
+                segmentationData: "Dicom/getSegmentData",
             }),
+            studyIsChosen() {
+                if (!Object.keys(this.chosenStudy).length) {
+                    return false;
+                }
+                return true;
+            },
             rotation: {
                 get() {
                     return this.currentRotate;
@@ -245,15 +220,24 @@
                 "fetchStudies",
                 "uploadState",
                 "selectSeries",
-                "changeCurrentSliceNumber"
+                "fetchSegment",
+                "changeCurrentSliceNumber",
+                "markSlice"
             ]),
             download() {
-                let filename = "test.png";
+                let current_position = this.dwvApp.getViewController().getCurrentPosition();
+                let current_frame = this.dwvApp.getViewController().getCurrentFrame();
+
+                const filename = `slice-${current_position.k}_frame-${current_frame}.png`;
+
+
                 let canvas = document.getElementById("downloadCanvas");
                 let canvas1 = document.getElementById("canvas1");
                 let canvas2 = document.getElementsByClassName("konvajs-content")[0].children[0];
 
                 var context = canvas.getContext('2d');
+                context.save();
+
 
                 context.drawImage(canvas1, 0, 0);
                 context.scale(0.5, 0.5);
@@ -264,6 +248,7 @@
 
                 /// the key here is to set the download attribute of the a tag
                 lnk.download = filename;
+
 
                 /// convert canvas content to data-uri for link. When download
                 /// attribute is set the content pointed to by link will be
@@ -281,6 +266,10 @@
                 } else if (lnk.fireEvent) {
                     lnk.fireEvent("onclick");
                 }
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Restore the transform
+                context.restore();
             },
             pastPrev() {
                 this.drawOff();
@@ -302,8 +291,118 @@
                 let new_draw = state.drawings;
                 new_draw.children = [state.drawings.children[i]];
                 new_draw.children[0].attrs.id = current_id;
+                console.log(new_draw);
 
                 this.dwvApp.setDrawings(new_draw, null);
+            },
+            async autoSegment() {
+                this.drawOff();
+                this.loadFinish=false;
+
+                let state = JSON.parse(this.dwvApp.getState());
+                let current_position = this.dwvApp.getViewController().getCurrentPosition();
+                let current_frame = this.dwvApp.getViewController().getCurrentFrame();
+                const current_id = `slice-${current_position.k}_frame-${current_frame}`;
+                let drawingDetailName = `auto_segmetate_${current_id}`;
+
+                const i = Object.keys(state.drawingsDetails).findIndex(key => key === drawingDetailName);
+
+                if (i !== -1) {
+                    this.loadFinish=true;
+                    return ;
+                }
+
+
+                await this.fetchSegment(this.chosenSeries.instances[this.sliceNumber].id);
+
+
+                if (this.segmentationData.length === 0) {
+                    await this.$store.dispatch('Snackbar/set', 'Искусственый интелект не нашел венозные каналы на этом снимке');
+                    this.loadFinish=true;
+                    return ;
+                }
+
+                let template = JSON.parse("{\n" +
+                    "    \"attrs\": {\n" +
+                    "      \"listening\": true,\n" +
+                    "      \"visible\": true\n" +
+                    "    },\n" +
+                    "    \"className\": \"Layer\",\n" +
+                    "    \"children\": [\n" +
+                    "      {\n" +
+                    "        \"attrs\": {\n" +
+                    "          \"name\": \"position-group\",\n" +
+                    "          \"id\": \"slice-0_frame-0\",\n" +
+                    "          \"visible\": true\n" +
+                    "        },\n" +
+                    "        \"className\": \"Group\",\n" +
+                    "        \"children\": [\n" +
+                    "        ]\n" +
+                    "      }\n" +
+                    "    ]\n" +
+                    "  }");
+
+
+                template.children[0].attrs.id  = current_id;
+                for (let i = 0; i < this.segmentationData.length; i++) {
+                    template.children[0].children.push({
+                        attrs: {
+                            name: "freeHand-group",
+                            visible: true,
+                            id: drawingDetailName,
+                            draggable: true
+                        },
+                        className: "Group",
+                        children: [
+                            {
+                                attrs: {
+                                    points: this.segmentationData[i],
+                                    stroke: "#0400ff",
+                                    strokeWidth: 2.048,
+                                    name: "shape",
+                                    tension: 0.5
+                                },
+                                className: "Line"
+                            },
+                            {
+                                attrs: {
+                                    x: 377,
+                                    y: 286,
+                                    name: "label"
+                                },
+                                className: "Label",
+                                children: [
+                                    {
+                                        attrs: {
+                                            "fontSize": 12.288,
+                                            "fontFamily": "Verdana",
+                                            "fill": "#0400ff",
+                                            "name": "text"
+                                        },
+                                        className: "Text"
+                                    },
+                                    {
+                                        "attrs": {
+                                            "height": 12.288
+                                        },
+                                        "className": "Tag"
+                                    }
+                                ]
+                            }
+                        ]
+                    })
+                }
+
+                let template_details = {};
+                template_details[drawingDetailName] = {
+                    textExpr: "",
+                    longText: "",
+                    quant: null
+                };
+                this.dwvApp.setDrawings(template, template_details);
+
+                this.drawOn();
+                this.loadFinish=true;
             },
             async saveState() {
                 this.drawOff();
@@ -352,6 +451,8 @@
                 // if (this.currentRotate === i) {
                 //     return;
                 // }
+
+                this.drawOff();
 
                 let urls = [];
 
@@ -431,6 +532,13 @@
             });
             this.dwvApp.addEventListener('abort', (/*event*/) => {
                 ++nReceivedAbort
+            });
+            this.dwvApp.addEventListener('draw-create', (/*event*/) => {
+                this.markSlice(this.dwvApp.getDrawController().getDrawDisplayDetails());
+            });
+
+            this.dwvApp.addEventListener('draw-delete', (/*event*/) => {
+                this.markSlice(this.dwvApp.getDrawController().getDrawDisplayDetails());
             });
 
             // handle key events

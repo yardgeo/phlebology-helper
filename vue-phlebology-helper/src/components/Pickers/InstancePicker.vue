@@ -9,7 +9,7 @@
                 show-arrows
         >
             <v-slide-item
-                    v-for="instance in instances"
+                    v-for="(instance, index) in instances"
                     :key="instance.id"
                     v-slot="{ active, toggle }"
             >
@@ -18,10 +18,18 @@
                         class="ma-4 ml-0"
                         height="100"
                         width="100"
-                        :style="'border: 1px solid red;'"
+                        :style="'border: 1px solid;'"
                         @click="toggle"
                 >
                     <v-img :src="instance.preview" lazy-src="../../assets/venousPlaceholder.jpeg">
+                        <v-icon
+                                v-if="markedSlices.includes(index.toString())"
+                                right
+                                small
+                                color="orange darken-2"
+                        >
+                            mdi-marker
+                        </v-icon>
                         <template v-slot:placeholder>
                             <v-row
                                     class="fill-height ma-0"
@@ -35,20 +43,6 @@
                             </v-row>
                         </template>
                     </v-img>
-                    <v-row
-                            class="fill-height"
-                            align="center"
-                            justify="center"
-                    >
-                        <v-scale-transition>
-                            <v-icon
-                                    v-if="active"
-                                    color="white"
-                                    size="48"
-                                    v-text="'mdi-close-circle-outline'"
-                            ></v-icon>
-                        </v-scale-transition>
-                    </v-row>
                 </v-card>
             </v-slide-item>
         </v-slide-group>
@@ -59,7 +53,7 @@
     import {mapGetters} from "vuex";
 
     export default {
-        name: "SeriesScroller",
+        name: "InstancePicker",
         data() {
             return {
             }
@@ -67,7 +61,8 @@
         computed: {
             ...mapGetters({
                 series: 'Dicom/getChosenSeries',
-                sliceNumber: "Dicom/getCurrentSliceNumber"
+                sliceNumber: "Dicom/getCurrentSliceNumber",
+                markedSlices: "Dicom/getMarkedSlices"
             }),
             model: {
                 get() {
@@ -91,6 +86,11 @@
             },
         },
         methods: {
+            marked(id) {
+                let index = this.series.instances.findIndex(ins => ins.id === id);
+                console.log(index, this.markedSlices, index.toString() in this.markedSlices);
+                return index.toString() in this.markedSlices;
+            },
         }
     }
 

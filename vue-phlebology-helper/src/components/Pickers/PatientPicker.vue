@@ -41,8 +41,9 @@
             ]),
         },
         async created() {
-            if (this.patients.length < 1)
+            if (this.patients.length < 1) {
                 await this.fetchPatients();
+            }
         }
     }
 </script>
