@@ -30,3 +30,7 @@ class Config(object):
     ORTHANC_USER = os.environ.get('ORTHANC_USER') or 'orthancUser'
     ORTHANC_PASSWORD = os.environ.get('ORTHANC_PASSWORD') or 'orthancSecretPassword'
     ORTHANC_URL = os.environ.get('ORTHANC_URL') or 'http://130.193.52.22:8042/'
+
+    # auto segmenatation
+    PRETRAINED_IMG_SIZE = os.environ.get('PRETRAINED_IMG_SIZE') or 128
+    PRETRAINED_MODEL_PATH = os.environ.get('PRETRAINED_MODEL_PATH') or 'data/model6'

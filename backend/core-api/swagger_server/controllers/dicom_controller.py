@@ -6,6 +6,7 @@ from swagger_server import util
 
 # services
 import swagger_server.services.patient_service as patient_service
+import swagger_server.services.segmentation_service as segmentation_service
 
 from flask import send_file
 
@@ -27,3 +28,8 @@ def download_dicom(id):  # noqa: E501
 def preview(id):
     decoded_string = patient_service.preview(id)
     return decoded_string
+
+
+def segment(id):
+    segmetation_objects = segmentation_service.auto_segment(id)
+    return segmetation_objects

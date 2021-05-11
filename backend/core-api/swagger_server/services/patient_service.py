@@ -6,12 +6,10 @@ from swagger_server.app import db
 from swagger_server.db_models import Patient, Study, Instance, Series
 
 # services
-from swagger_server.services.orthanc_service import OrthancClient
+from swagger_server.services.orthanc_service import orthancClient
 
 # logger
 from swagger_server import logger
-
-orthancClient = OrthancClient()
 
 
 def get_patients():

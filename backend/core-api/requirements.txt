@@ -11,3 +11,7 @@ flask-migrate
 python-dotenv
 xlrd
 docxtpl
+pydicom
+pillow
+torchvision
+torch

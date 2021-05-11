@@ -47,3 +47,6 @@ class OrthancClient:
                                     headers={'Accept': 'image/jpeg'})
         decoded_blob = base64.b64encode(response.content).decode()
         return "data:image/jpeg;base64," + decoded_blob
+
+
+orthancClient = OrthancClient()

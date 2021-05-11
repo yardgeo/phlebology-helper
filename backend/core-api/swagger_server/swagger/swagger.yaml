@@ -66,6 +66,32 @@ paths:
       security:
       - JWT: []
       x-swagger-router-controller: "swagger_server.controllers.dicom_controller"
+  /dicom/{id}/segment:
+    get:
+      tags:
+      - "dicom"
+      summary: "Preview dicom image"
+      operationId: "segment"
+      parameters:
+      - in: "path"
+        type: string
+        name: "id"
+        description: "Studi id"
+        required: true
+      responses:
+        "200":
+          description: "preview"
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: number
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.dicom_controller"
   /series/{seriesId}/state.json:
     get:
       tags:

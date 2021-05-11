@@ -1,15 +1,15 @@
 version: '3.3'
 services:
-#  db-phleb:
-#    image: postgres
-#    ports:
-#      - "5433:5432"
-#    environment:
-#      - POSTGRES_USER=admin
-#      - POSTGRES_PASSWORD=admin
-#      - POSTGRES_DB=viewer
-#    networks:
-#      - phlebology_helper_network
+  db-phleb:
+    image: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=phlb_viewer
+      - POSTGRES_PASSWORD=phlb_viewer
+      - POSTGRES_DB=phlb_viewer
+    networks:
+      - phlebology_helper_network
 
   core-api-phleb:
     container_name: core-api-phleb
@@ -19,7 +19,7 @@ services:
     environment:
       - UWSGI_INI=uwsgi.ini
       - PRE_START_PATH=/usr/src/phlebology-helper-backend/prestart.sh
-      - DATABASE_URL=postgresql://phlb_viewer:phlb_viewer@130.193.52.22:5432/phlb_viewer
+      - DATABASE_URL=postgresql://phlb_viewer:phlb_viewer@db-phleb/phlb_viewer
     networks:
       - phlebology_helper_network
 
