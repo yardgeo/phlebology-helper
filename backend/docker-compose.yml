@@ -2,8 +2,6 @@ version: '3.3'
 services:
   db-phleb:
     image: postgres
-    ports:
-      - "5433:5432"
     environment:
       - POSTGRES_USER=phlb_viewer
       - POSTGRES_PASSWORD=phlb_viewer
