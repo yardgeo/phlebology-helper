@@ -52,6 +52,24 @@
                                         <v-btn
                                                 x-large
                                                 icon
+                                                @click="undo"
+                                        >
+                                            <v-icon>mdi-undo</v-icon>
+                                        </v-btn>
+                                    </div>
+                                    <div class="mt-4">
+                                        <v-btn
+                                                x-large
+                                                icon
+                                                @click="redo"
+                                        >
+                                            <v-icon>mdi-redo</v-icon>
+                                        </v-btn>
+                                    </div>
+                                    <div class="mt-4">
+                                        <v-btn
+                                                x-large
+                                                icon
                                                 @click="zoomPlus"
                                         >
                                             <v-icon>mdi-magnify-plus-outline</v-icon>
@@ -428,6 +446,12 @@
                 this.dwvApp.stepZoom(-0.1, 250, 250);
 
             },
+            undo() {
+                this.dwvApp.undo();
+            },
+            redo() {
+                this.dwvApp.redo();
+            },
             drawClick() {
                 if (!this.drawStatus) {
                     this.drawOn();
@@ -440,6 +464,7 @@
                 this.drawButtonColor = 'orange darken-2';
                 this.dwvApp.setTool("Draw");
                 this.dwvApp.setDrawShape(this.tools.Draw.options[0]);
+                this.dwvApp.setDrawLineColour("#0400ff");
             },
             drawOff() {
                 this.drawStatus = false;
