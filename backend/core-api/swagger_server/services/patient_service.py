@@ -24,7 +24,7 @@ def get_patients():
 
     db.session().commit()
 
-    return db.session().query(Patient).all()
+    return db.session().query(Patient).order_by(Patient.name).all()
 
 
 def get_patient_by_id(id):
@@ -83,7 +83,7 @@ def get_series(study_id):
                                       series_id=series_id))
 
     db.session().commit()
-    return Series.query.filter(Series.study_id == study_id).all()
+    return Series.query.filter(Series.study_id == study_id).order_by(Series.id).all()
 
 
 def get_series_by_id(id):

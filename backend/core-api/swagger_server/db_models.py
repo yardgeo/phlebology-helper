@@ -26,7 +26,7 @@ class Patient(db.Model):
 
     name = db.Column(db.String(128))
 
-    studies = db.relationship('Study', backref='patient', lazy='selectin')
+    studies = db.relationship('Study', backref='patient', lazy='selectin', order_by="Study.id")
 
 
 class Instance(db.Model):
@@ -55,7 +55,7 @@ class Study(db.Model):
 
     patient_id = db.Column(db.String(128), db.ForeignKey('patient.id'))
 
-    series = db.relationship('Series', backref='study', lazy='selectin')
+    series = db.relationship('Series', backref='study', lazy='selectin', order_by="Series.id")
 
     date = db.Column(db.DateTime)
 
