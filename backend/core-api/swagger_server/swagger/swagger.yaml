@@ -14,17 +14,26 @@ tags:
   description: "patientInfo"
 - name: "dicom"
   description: "dicomInfo"
+- name: "series"
+  description: "seriesInfo"
+- name: "study"
+  description: "studyInfo"
 schemes:
 - "https"
 - "http"
 paths:
-  /dicom/preview:
+  /dicom/{id}:
     get:
       tags:
       - "dicom"
-      summary: "Get patients ids"
-      operationId: "preview"
-      parameters: []
+      summary: "Download dicom image"
+      operationId: "download_dicom"
+      parameters:
+      - in: "path"
+        type: string
+        name: "id"
+        description: "Studi id"
+        required: true
       responses:
         "200":
           description: "preview"
@@ -34,7 +43,176 @@ paths:
           description: "Invalid status value"
       security:
       - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.dicom_controller"
+  /dicom/{id}/preview:
+    get:
+      tags:
+      - "dicom"
+      summary: "Preview dicom image"
+      operationId: "preview"
+      parameters:
+      - in: "path"
+        type: string
+        name: "id"
+        description: "Studi id"
+        required: true
+      responses:
+        "200":
+          description: "preview"
+          schema:
+            type: string
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.dicom_controller"
+  /dicom/{id}/segment:
+    get:
+      tags:
+      - "dicom"
+      summary: "Preview dicom image"
+      operationId: "segment"
+      parameters:
+      - in: "path"
+        type: string
+        name: "id"
+        description: "Studi id"
+        required: true
+      responses:
+        "200":
+          description: "preview"
+          schema:
+            type: array
+            items:
+              type: array
+              items:
+                type: number
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.dicom_controller"
+  /series/{seriesId}/state.json:
+    get:
+      tags:
+      - "series"
+      summary: "Get series state"
+      operationId: "get_state"
+      parameters:
+      - in: "path"
+        type: string
+        name: "seriesId"
+        description: "Series id"
+        required: true
+      responses:
+        "200":
+          description: "get serie state"
+          schema:
+            type: object
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.series_controller"
+
+  /series/{seriesId}/state:
+    post:
+      tags:
+      - "series"
+      summary: "Upload series state"
+      operationId: "upload_state"
+      parameters:
+      - in: "path"
+        type: string
+        name: "seriesId"
+        description: "Series id"
+        required: true
+      - in: "body"
+        name: "state"
+        description: "State"
+        required: true
+        schema:
+          type: object
+      responses:
+        "200":
+          description: "ok"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.series_controller"
+
+  /patient/{patientId}/studies/list:
+    get:
+      tags:
+      - "patient"
+      summary: "Get patients ids"
+      operationId: "get_studies"
+      parameters:
+      - in: "path"
+        type: string
+        name: "patientId"
+        description: "Patient id"
+        required: true
+      responses:
+        "200":
+          description: "Studies"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Study"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
       x-swagger-router-controller: "swagger_server.controllers.patient_controller"
+
+  /series/{seriesId}:
+    get:
+      tags:
+      - "series"
+      summary: "Get series by id"
+      operationId: "get_series_by_id"
+      parameters:
+      - in: "path"
+        type: string
+        name: "seriesId"
+        description: "series id"
+        required: true
+      responses:
+        "200":
+          description: "Series"
+          schema:
+            $ref: "#/definitions/Series"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.series_controller"
+
+  /studies/{studyId}:
+    get:
+      tags:
+      - "study"
+      summary: "Get study by id"
+      operationId: "get_study_by_id"
+      parameters:
+      - in: "path"
+        type: string
+        name: "studyId"
+        description: "Study id"
+        required: true
+      responses:
+        "200":
+          description: "Study"
+          schema:
+            $ref: "#/definitions/Study"
+        "400":
+          description: "Invalid status value"
+      security:
+      - JWT: []
+      x-swagger-router-controller: "swagger_server.controllers.study_controller"
+
   /patient/list:
     get:
       tags:
@@ -45,6 +223,10 @@ paths:
       responses:
         "200":
           description: "Patients id"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Patient"
         "400":
           description: "Invalid status value"
       security:
@@ -66,6 +248,8 @@ paths:
       responses:
         "200":
           description: "Patient"
+          schema:
+            $ref: "#/definitions/Patient"
         "400":
           description: "Invalid status value"
       security:
@@ -230,3 +414,52 @@ definitions:
         type: "string"
       email:
         type: "string"
+
+  Series:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      orientation:
+        type: "string"
+      hasState:
+        type: boolean
+      instances:
+        type: array
+        items:
+          $ref: "#/definitions/Instance"
+
+  Study:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      description:
+        type: "string"
+      series:
+        type: array
+        items:
+          $ref: "#/definitions/Series"
+      studyDate:
+        type: "string"
+        format: "date-time"
+
+  Instance:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      preview:
+        type: string
+
+  Patient:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      studies:
+        type: array
+        items:
+          $ref: "#/definitions/Study"

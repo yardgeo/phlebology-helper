@@ -3,7 +3,7 @@ import os
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://phlb_site:phlb_site@20.56.16.251:5432/viewer'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgresql://phlb_viewer:phlb_viewer@130.193.52.22:5432/phlb_viewer'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_AS_ASCII = False
     RUN_PORT = os.environ.get('RUN_PORT') or 8080
@@ -25,3 +25,12 @@ class Config(object):
     SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD') or 'admin_mail'
     SMTP_HOST = os.environ.get('SMTP_HOST') or 'smtp.gmail.com'
     SMTP_PORT = os.environ.get('SMTP_PORT') or 587
+
+    # orthanc
+    ORTHANC_USER = os.environ.get('ORTHANC_USER') or 'orthancUser'
+    ORTHANC_PASSWORD = os.environ.get('ORTHANC_PASSWORD') or 'orthancSecretPassword'
+    ORTHANC_URL = os.environ.get('ORTHANC_URL') or 'http://84.252.141.49:8042/'
+
+    # auto segmenatation
+    PRETRAINED_IMG_SIZE = os.environ.get('PRETRAINED_IMG_SIZE') or 128
+    PRETRAINED_MODEL_PATH = os.environ.get('PRETRAINED_MODEL_PATH') or 'data/model6'
