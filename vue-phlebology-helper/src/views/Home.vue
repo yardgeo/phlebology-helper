@@ -309,7 +309,6 @@
                 let new_draw = state.drawings;
                 new_draw.children = [state.drawings.children[i]];
                 new_draw.children[0].attrs.id = current_id;
-                console.log(new_draw);
 
                 this.dwvApp.setDrawings(new_draw, null);
             },
