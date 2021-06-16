@@ -23,109 +23,117 @@
             <v-col
                     cols="6"
             >
-                    <v-card :loading="!this.loadFinish" flex-grow-1>
-                        <v-container fluid>
-                            <v-row align="start" justify="center" no-gutters>
-                                <v-col cols="11">
-                                    <div id="dwv">
+                <v-card :loading="!this.loadFinish" flex-grow-1>
+                    <v-container fluid>
+                        <v-row align="start" justify="center" no-gutters>
+                            <v-col cols="11">
+                                <div id="dwv">
                                     <div class="layerContainer">
-                                            <canvas class="imageLayer" id="canvas1"></canvas>
-                                            <div class="drawDiv"></div>
-                                        </div>
+                                        <canvas class="imageLayer" id="canvas1"></canvas>
+                                        <div class="drawDiv"></div>
                                     </div>
-                                    <InstancePicker  @changeCurrentSliceNumberFromSlider="changeCurrentSliceNumberFromSlider"/>
-                                </v-col>
-                                <v-col
-                                        cols="1"
-                                        v-if="this.rotation > -1">
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                :color="drawButtonColor"
-                                                @click="drawClick"
-                                        >
-                                            <v-icon>mdi-fountain-pen</v-icon>
-                                        </v-btn>
-                                    </div>
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                @click="undo"
-                                        >
-                                            <v-icon>mdi-undo</v-icon>
-                                        </v-btn>
-                                    </div>
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                @click="redo"
-                                        >
-                                            <v-icon>mdi-redo</v-icon>
-                                        </v-btn>
-                                    </div>
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                @click="zoomPlus"
-                                        >
-                                            <v-icon>mdi-magnify-plus-outline</v-icon>
-                                        </v-btn>
-                                    </div>
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                @click="zoomMinus"
-                                        >
-                                            <v-icon>mdi-magnify-minus-outline</v-icon>
-                                        </v-btn>
-                                    </div>
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                @click="saveState"
-                                        >
-                                            <v-icon>mdi-content-save</v-icon>
-                                        </v-btn>
-                                    </div>
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                @click="download"
-                                        >
-                                            <v-icon>mdi-download</v-icon>
-                                        </v-btn>
-                                    </div>
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                @click="pastPrev"
-                                        >
-                                            <v-icon>mdi-content-paste</v-icon>
-                                        </v-btn>
-                                    </div>
-                                    <div class="mt-4">
-                                        <v-btn
-                                                x-large
-                                                icon
-                                                @click="autoSegment"
-                                        >
-                                            <v-icon>mdi-brightness-auto</v-icon>
-                                        </v-btn>
-                                    </div>
-                                </v-col>
-                            </v-row>
-                        </v-container>
-                    </v-card>
+                                </div>
+                                <InstancePicker
+                                        @changeCurrentSliceNumberFromSlider="changeCurrentSliceNumberFromSlider"/>
+                            </v-col>
+                            <v-col
+                                    cols="1"
+                                    v-if="this.rotation > -1">
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            :color="drawButtonColor"
+                                            @click="drawClick"
+                                    >
+                                        <v-icon>mdi-fountain-pen</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            @click="undo"
+                                    >
+                                        <v-icon>mdi-undo</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            @click="redo"
+                                    >
+                                        <v-icon>mdi-redo</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            @click="zoomPlus"
+                                    >
+                                        <v-icon>mdi-magnify-plus-outline</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            @click="zoomMinus"
+                                    >
+                                        <v-icon>mdi-magnify-minus-outline</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            @click="saveState"
+                                    >
+                                        <v-icon>mdi-content-save</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            @click="download"
+                                    >
+                                        <v-icon>mdi-download</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            @click="pastPrev"
+                                    >
+                                        <v-icon>mdi-content-paste</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    <v-btn
+                                            x-large
+                                            icon
+                                            @click="autoSegment"
+                                    >
+                                        <v-icon>mdi-brightness-auto</v-icon>
+                                    </v-btn>
+                                </div>
+                                <div class="mt-4">
+                                    Площадь сегм.
+                                    <v-switch
+                                            v-model="showSquare"
+                                    >
+                                    </v-switch>
+                                </div>
+                            </v-col>
+                        </v-row>
+                    </v-container>
+                </v-card>
             </v-col>
-            <v-col cols="3" >
+            <v-col cols="3">
                 <v-card v-if="studyIsChosen"
                 >
                     <SeriesPicker @addDicom="addDicom"/>
@@ -162,19 +170,21 @@
 
     import AuthService from '@/services/auth.service';
     import {mapActions, mapGetters} from "vuex";
+    import {GausSquare} from "../services/utils";
 
     export default {
         name: "Dashboard",
         components: {StudyScroller, PatientPicker, InstancePicker, SeriesPicker},
         data() {
             return {
-                model:null,
+                model: null,
                 dwvApp: null,
                 test: 0,
                 loadItem: 0,
                 loadFinish: true,
                 drawStatus: false,
                 drawButtonColor: "white",
+                showSquare: false,
                 currentRotate: -1,
                 currentSeries: null,
                 tools: {
@@ -190,6 +200,12 @@
                 // empty image
                 src: "",
                 files: [],
+            }
+        },
+        watch: {
+            showSquare(){
+                //called whenever switch1 changes
+                this.calcSurface();
             }
         },
         computed: {
@@ -293,6 +309,8 @@
                 this.drawOff();
 
                 let state = JSON.parse(this.dwvApp.getState());
+                console.log(state);
+                console.log(this.dwvApp.getMetaData()['PixelSpacing']);
                 let current_position = this.dwvApp.getViewController().getCurrentPosition();
                 let current_frame = this.dwvApp.getViewController().getCurrentFrame();
 
@@ -302,7 +320,7 @@
                 // find previous drawing
                 const i = state.drawings.children.findIndex(draw => draw.attrs.id === pred_id);
                 if (i === -1) {
-                    return ;
+                    return;
                 }
 
                 // create new drawing
@@ -314,7 +332,7 @@
             },
             async autoSegment() {
                 this.drawOff();
-                this.loadFinish=false;
+                this.loadFinish = false;
 
                 let state = JSON.parse(this.dwvApp.getState());
                 let current_position = this.dwvApp.getViewController().getCurrentPosition();
@@ -325,8 +343,8 @@
                 const i = Object.keys(state.drawingsDetails).findIndex(key => key === drawingDetailName);
 
                 if (i !== -1) {
-                    this.loadFinish=true;
-                    return ;
+                    this.loadFinish = true;
+                    return;
                 }
 
 
@@ -335,8 +353,8 @@
 
                 if (this.segmentationData.length === 0) {
                     await this.$store.dispatch('Snackbar/set', 'Искусственый интелект не нашел венозные каналы на этом снимке');
-                    this.loadFinish=true;
-                    return ;
+                    this.loadFinish = true;
+                    return;
                 }
 
                 let template = JSON.parse("{\n" +
@@ -360,13 +378,14 @@
                     "  }");
 
 
-                template.children[0].attrs.id  = current_id;
+                template.children[0].attrs.id = current_id;
+                let template_details = {};
                 for (let i = 0; i < this.segmentationData.length; i++) {
                     template.children[0].children.push({
                         attrs: {
                             name: "freeHand-group",
                             visible: true,
-                            id: drawingDetailName,
+                            id: `${drawingDetailName}_${i}`,
                             draggable: true
                         },
                         className: "Group",
@@ -383,18 +402,19 @@
                             },
                             {
                                 attrs: {
-                                    x: 377,
-                                    y: 286,
+                                    x: this.segmentationData[i][0] + 5,
+                                    y: this.segmentationData[i][1] + 5,
                                     name: "label"
                                 },
                                 className: "Label",
                                 children: [
                                     {
                                         attrs: {
-                                            "fontSize": 12.288,
+                                            "fontSize": 15.288,
                                             "fontFamily": "Verdana",
                                             "fill": "#0400ff",
-                                            "name": "text"
+                                            "name": "text",
+                                            "text": "64.42"
                                         },
                                         className: "Text"
                                     },
@@ -407,19 +427,21 @@
                                 ]
                             }
                         ]
-                    })
+                    });
+                    console.log(this.segmentationData[i]);
+
+                    template_details[`${drawingDetailName}_${i}`] = {
+                        textExpr: "{surface}",
+                        longText: null,
+                        quant: null
+                    };
                 }
 
-                let template_details = {};
-                template_details[drawingDetailName] = {
-                    textExpr: "",
-                    longText: "",
-                    quant: null
-                };
+
                 this.dwvApp.setDrawings(template, template_details);
 
                 this.drawOn();
-                this.loadFinish=true;
+                this.loadFinish = true;
             },
             async saveState() {
                 this.drawOff();
@@ -502,6 +524,30 @@
                 pos.k = i;
                 this.changeCurrentSliceNumber(pos.k);
                 this.dwvApp.getViewController().setCurrentPosition(pos);
+            },
+            calcSurface() {
+                let state = JSON.parse(this.dwvApp.getState());
+                let details = state.drawingsDetails;
+                let dicom_pixels = this.dwvApp.getMetaData()['PixelSpacing'].value.split("\\");
+                let pixel_square = parseFloat(dicom_pixels[0]) * parseFloat(dicom_pixels[1]);
+                console.log("asd", this.showSquare);
+
+                if (state.drawings.children.length === 0) {
+                    return;
+                }
+
+                for (let i = 0; i < state.drawings.children[0].children.length; i++) {
+
+                    let current_draw = state.drawings.children[0].children[i];
+                    let square = GausSquare(current_draw.children[0].attrs.points, pixel_square);
+                    console.log(square, pixel_square, current_draw.children[0].attrs.points);
+                    if (square < 0 || !this.showSquare) {
+                        square = null;
+                    }
+                    details[current_draw.attrs.id].textExpr = "{surface}";
+                    details[current_draw.attrs.id].quant = {surface: {value: square}};
+                    this.dwvApp.updateDraw({id: current_draw.attrs.id, color: "#05ffff", label: square});
+                }
             }
         },
         mounted() {
@@ -522,7 +568,7 @@
                 pos.k = 0;
                 this.dwvApp.getViewController().setCurrentPosition(pos);
                 if (event.loadtype !== "image") {
-                    this.loadFinish=true;
+                    this.loadFinish = true;
                     return;
                 }
                 this.changeCurrentSliceNumber(0);
@@ -534,14 +580,14 @@
                             {name: "Content-Type", value: 'application/json'}],
                         true);
                 }
-                this.loadFinish=true;
+                this.loadFinish = true;
                 console.log(this.dwvApp.getLayerContainerSize());
             });
 
             this.dwvApp.addEventListener('load-start', (event) => {
                 if (event.loadtype === "image") {
                     this.loadItem = 0;
-                    this.loadFinish=false;
+                    this.loadFinish = false;
                 }
                 nReceivedError = 0;
                 nReceivedAbort = 0;
@@ -559,6 +605,10 @@
             });
             this.dwvApp.addEventListener('draw-create', (/*event*/) => {
                 this.markSlice(this.dwvApp.getDrawController().getDrawDisplayDetails());
+                this.calcSurface();
+            });
+            this.dwvApp.addEventListener('draw-change', (/*event*/) => {
+                this.calcSurface();
             });
 
             this.dwvApp.addEventListener('draw-delete', (/*event*/) => {
@@ -588,6 +638,12 @@
 
             // handle window resize
             window.addEventListener('resize', this.dwvApp.onResize);
+            let canvas1 = document.getElementById("canvas1");
+
+            canvas1.addEventListener('mousewheel', event => {
+                event.stopImmediatePropagation();
+            });
+
 // load dicom data
 //             this.simpleLoad();
 
