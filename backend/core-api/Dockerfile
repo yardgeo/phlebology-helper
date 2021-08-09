@@ -10,5 +10,6 @@ COPY requirements.txt /usr/src/phlebology-helper-backend/
 RUN python3 -m pip install -r requirements.txt --no-cache-dir
 
 COPY . /usr/src/phlebology-helper-backend
+COPY nginx-ssl.conf /etc/nginx/conf.d/nginx-ssl.conf
 
 COPY prestart.sh /app/prestart.sh

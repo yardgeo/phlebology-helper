@@ -12,7 +12,8 @@ services:
   core-api-phleb:
     container_name: core-api-phleb
     ports:
-      - "8992:80"
+      - "8992:443"
+      - "8991:80"
     build: ./core-api
     environment:
       - UWSGI_INI=uwsgi.ini
@@ -20,7 +21,9 @@ services:
       - DATABASE_URL=postgresql://phlb_viewer:phlb_viewer@db-phleb/phlb_viewer
     networks:
       - phlebology_helper_network
-
+    volumes:
+      - /etc/letsencrypt/live/exgratia.ru/privkey.pem:/etc/letsencrypt/live/exgratia.ru/privkey.pem
+      - /etc/letsencrypt/live/exgratia.ru/fullchain.pem:/etc/letsencrypt/live/exgratia.ru/fullchain.pem
 
 
 networks:
