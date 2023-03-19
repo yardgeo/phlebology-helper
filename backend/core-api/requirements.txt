@@ -1,0 +1,17 @@
+pandas
+connexion[swagger-ui]==2.6.0
+python-jose[cryptography]
+python_dateutil==2.6.0
+setuptools==21.0.0
+flask_sqlalchemy==2.4.3
+flask_cors==3.0.8
+psycopg2-binary==2.8.4
+requests==2.20.0
+flask-migrate
+python-dotenv
+xlrd
+docxtpl
+pydicom
+pillow
+torchvision
+torch

@@ -1,0 +1,45 @@
+{
+  "version": "0.3",
+  "window-center": 401.18,
+  "window-width": 697.67,
+  "position": {
+    "i": 0,
+    "j": 0,
+    "k": 0
+  },
+  "scale": 1,
+  "scaleCenter": {
+    "x": 0,
+    "y": 0
+  },
+  "translation": {
+    "x": 0,
+    "y": 0
+  },
+  "drawings": {
+    "attrs": {
+      "listening": true,
+      "visible": true
+    },
+    "className": "Layer",
+    "children": [
+      {
+        "attrs": {
+          "name": "position-group",
+          "id": "slice-0_frame-0",
+          "visible": true
+        },
+        "className": "Group",
+        "children": [
+        ]
+      }
+    ]
+  },
+  "drawingsDetails": {
+    "xymhlnyeqke": {
+      "textExpr": "",
+      "longText": "",
+      "quant": null
+    }
+  }
+}

@@ -1,0 +1,7 @@
+version: '3.3'
+services:
+  web:
+    container_name: viewer-web
+    build: ""
+    ports:
+    - "835:80"

@@ -1,0 +1,7 @@
+version: '3.3'
+services:
+  phlebology-web:
+    container_name: phlebology-web
+    build: ""
+    ports:
+    - "850:80"
